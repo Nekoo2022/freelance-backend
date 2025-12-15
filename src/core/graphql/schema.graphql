@@ -1,0 +1,184 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthResponse {
+  accessToken: String!
+  refreshToken: String!
+  user: UserModel!
+}
+
+input CreateCategoryChildrenInput {
+  """Category ID"""
+  categoryId: String!
+
+  """Category ID"""
+  name: String!
+
+  """Category ID"""
+  slug: String!
+}
+
+input CreateCategoryInput {
+  """Category ID"""
+  name: String!
+
+  """Category ID"""
+  slug: String!
+}
+
+input CreateGigInput {
+  """Category ID"""
+  categoryId: String!
+
+  """Delivery time in days"""
+  deliveryTime: Int!
+
+  """Gig description"""
+  description: String!
+
+  """Gig image URL"""
+  imageUrl: String
+
+  """Gig price"""
+  price: Float!
+
+  """Gig title"""
+  title: String!
+}
+
+input CreateUserInput {
+  """User email address"""
+  email: String!
+
+  """User full name"""
+  name: String!
+
+  """User password"""
+  password: String!
+
+  """Username"""
+  username: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type GigModel {
+  authorId: String!
+  categoryId: String!
+  completedOrders: Float!
+  createdAt: DateTime!
+  deliveryTime: Float!
+  description: String!
+  favoritesCount: Float!
+  id: String!
+  imageUrl: String
+  isFeatured: Boolean!
+  price: Float!
+  rating: Float!
+  status: GigStatus!
+  title: String!
+  updatedAt: DateTime!
+  views: Float!
+}
+
+enum GigStatus {
+  ARCHIVED
+  DELETED
+  DRAFT
+  PUBLISHED
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  ArchiveGig(gigId: String!): Boolean!
+  CreateCategory(data: CreateCategoryInput!): Boolean!
+  CreateCategoryChildren(data: CreateCategoryChildrenInput!): Boolean!
+  CreateGig(data: CreateGigInput!): Boolean!
+  CreateUser(data: CreateUserInput!): Boolean!
+  DeleteGig(gigId: String!): Boolean!
+  PublishGig(gigId: String!): Boolean!
+  UpdateGig(data: UpdateGigInput!): Boolean!
+  login(data: LoginInput!): AuthResponse!
+  logout: Boolean!
+  refreshToken(refreshToken: String!): AuthResponse!
+  register(data: CreateUserInput!): AuthResponse!
+}
+
+type Query {
+  FindAllGigs: [GigModel!]!
+  FindGigById(gigId: String!): GigModel!
+  FindMyGig: [GigModel!]!
+  GetUsers: [UserModel!]!
+}
+
+input UpdateGigInput {
+  """Delivery time in days"""
+  deliveryTime: Int
+
+  """Gig description"""
+  description: String
+
+  """Gig Id"""
+  gigId: String!
+
+  """Gig image URL"""
+  imageUrl: String
+
+  """Gig price"""
+  price: Float
+
+  """Gig title"""
+  title: String
+}
+
+type UserModel {
+  avatarUrl: String
+  balance: Float!
+  city: String
+  completedJobs: Float!
+  country: String
+  createdAt: DateTime!
+  description: String
+  email: String!
+  emailVerified: Boolean!
+  failedLoginAttempts: Float!
+  gigs: [GigModel!]!
+  hiddenGigs: [GigModel]
+  id: String!
+  lastSeenAt: DateTime
+  locale: String
+  lockUntil: DateTime
+  name: String
+  online: Boolean!
+  password: String
+  phoneNumber: String
+  phoneVerified: Boolean!
+  rating: Float!
+  role: UserRole!
+  status: UserStatus!
+  updatedAt: DateTime!
+  username: String!
+}
+
+enum UserRole {
+  ADMIN
+  BUYER
+  MODERATOR
+  SELLER
+  USER
+}
+
+enum UserStatus {
+  ACTIVE
+  BANNED
+  DELETED
+  SUSPENDED
+}

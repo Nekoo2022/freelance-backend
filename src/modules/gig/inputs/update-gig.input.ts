@@ -1,0 +1,50 @@
+import { Field, InputType, Float, Int } from '@nestjs/graphql';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  Min,
+  MaxLength,
+} from 'class-validator';
+
+@InputType()
+export class UpdateGigInput {
+  @Field(() => String, { description: 'Gig title', nullable: true })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(200)
+  @IsOptional()
+  title?: string;
+
+  @Field(() => String, { description: 'Gig description', nullable: true })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(5000)
+  @IsOptional()
+  description?: string;
+
+  @Field(() => Float, { description: 'Gig price', nullable: true })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  price?: number;
+
+  @Field(() => Int, { description: 'Delivery time in days', nullable: true })
+  @IsNumber()
+  @Min(1)
+  @IsOptional()
+  deliveryTime?: number;
+
+  @Field(() => String, { nullable: true, description: 'Gig image URL' })
+  @IsString()
+  @IsOptional()
+  imageUrl?: string;
+
+  @Field(() => String, { description: 'Gig Id' })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(200)
+  @IsOptional()
+  gigId: string;
+}

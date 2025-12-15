@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  // Base identity
+  id        String @id @default(cuid())
+  email     String @unique
+  username  String @unique
+  password  String
+  name      String
+  avatarUrl String?
+
+  // Contact & profile
+  phoneNumber String?
+  description String?
+
+  // Verification & security
+  emailVerified Boolean @default(false)
+  phoneVerified Boolean @default(false)
+
+  failedLoginAttempts Int      @default(0) // количество неудачных попыток входа подряд
+  lockUntil           DateTime? // время, до которого аккаунт временно заблокирован
+
+  // Roles & account status
+  role   UserRole   @default(USER)
+  status UserStatus @default(ACTIVE)
+
+  // Financial
+  balance Float @default(0) // внутренний баланс (escrow / выплаты)
+
+  gigs Gig[] @relation("UserGigs")
+  hiddenGigs HiddenGig[]
+  favoriteGigs FavoriteGig[]
+
+  // Location & localization
+  country String?
+  city    String?
+  locale  String? // язык интерфейса (ru, en, etc.)
+
+  // Activity & reputation
+  rating        Float   @default(0) // средний рейтинг пользователя
+  completedJobs Int     @default(0) // количество завершённых заказов
+  online        Boolean @default(false)
+  lastSeenAt    DateTime?
+
+  // System fields
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Gig {
+  // Identity
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  deliveryTime Int // время выполнения в днях
+
+  imageUrl String?
+
+  // Relations
+  author   User     @relation("UserGigs", fields: [authorId], references: [id])
+  authorId String
+
+  hiddenBy HiddenGig[]
+  favorites FavoriteGig[]
+
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  // Status & moderation
+  status     GigStatus @default(DRAFT)
+  isFeatured Boolean   @default(false) // пометка рекомендуемый
+
+  // Metrics
+  rating          Float @default(0) // средний рейтинг
+  completedOrders Int   @default(0) // количество завершенных заказов
+  views           Int   @default(0) // просмотры
+  favoritesCount Int @default(0) // количество пользователей, добавивших гиг в избранное
+
+  // System fields
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("gigs")
+}
+
+model HiddenGig {
+  id String @id @default(cuid())
+
+  user User @relation(fields: [userId], references: [id])
+  userId String
+
+  gig Gig @relation(fields: [gigId], references: [id])
+  gigId String
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, gigId])
+  @@map("hidden_gigs")
+}
+
+
+model FavoriteGig{
+  id String @id @default(cuid())
+
+  user User @relation(fields: [userId], references: [id])
+  userId String
+
+  gig Gig @relation(fields: [gigId], references: [id])
+  gigId String
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, gigId]) // пользователь не может добавить один и тот же гиг дважды
+  @@map("favorite_gigs")
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+
+  parent      Category?  @relation("CategoryParent", fields: [parentId], references: [id])
+  parentId    String?
+  children    Category[] @relation("CategoryParent")
+
+  gigs        Gig[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("categories")
+}
+
+
+enum GigStatus {
+  DRAFT      // черновик
+  PUBLISHED  // опубликован
+  ARCHIVED   // снят с публикации
+  DELETED    // удалён
+}
+
+
+enum UserRole {
+  USER       // базовый пользователь платформы
+  SELLER     // исполнитель услуг
+  BUYER      // заказчик
+  ADMIN      // администратор
+  MODERATOR  // модератор
+}
+
+enum UserStatus {
+  ACTIVE     // аккаунт активен и полностью функционален
+  SUSPENDED  // временная блокировка (проверка, жалобы)
+  BANNED     // перманентный бан
+  DELETED    // аккаунт удалён (soft delete)
+}
