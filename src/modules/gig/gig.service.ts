@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateGigInput } from './inputs/create-gig.input.js';
@@ -31,10 +32,30 @@ export class GigService {
     return true;
   }
 
-  async findAllGigs() {
+  async findAllGigs(userId?: string) {
+    if (userId) {
+      const hiddenGigIds = await this.prisma.hiddenGig
+        .findMany({
+          where: { userId },
+        })
+        .then((list) => list.map((hiddenGig) => hiddenGig.gigId));
+
+      const gigs = await this.prisma.gig.findMany({
+        where: {
+          id: { notIn: hiddenGigIds },
+        },
+      });
+
+      if (!gigs || gigs.length === 0)
+        throw new BadRequestException('Gigs не найдены');
+
+      return gigs;
+    }
+
     const gigs = await this.prisma.gig.findMany();
 
-    if (!gigs) throw new BadRequestException('Gigs не найдены');
+    if (!gigs || gigs.length === 0)
+      throw new BadRequestException('Gigs не найдены');
 
     return gigs;
   }
@@ -110,7 +131,69 @@ export class GigService {
     return true;
   }
 
-  // async addToFavorites(gigId: string, userId: string) {
-  //   const favorite = await this.prisma.
-  // }
+  async addToFavorites(gigId: string, userId: string) {
+    await this.prisma.favoriteGig.create({
+      data: { gigId, userId },
+    });
+
+    return true;
+  }
+
+  async removeFromFavorites(gigId: string, userId: string) {
+    await this.prisma.favoriteGig.delete({
+      where: {
+        userId_gigId: {
+          userId,
+          gigId,
+        },
+      },
+    });
+
+    return true;
+  }
+
+  async findFavoriteGigs(userId: string) {
+    const favoriteGigs = await this.prisma.favoriteGig.findMany({
+      where: { userId },
+      include: { gig: true },
+    });
+
+    const result = favoriteGigs.map((v) => v.gig);
+
+    return result;
+  }
+
+  async hideGig(gigId: string, userId: string) {
+    const gig = await this.prisma.gig.findUniqueOrThrow({
+      where: { id: gigId },
+    });
+
+    if (gig.authorId === userId) {
+      throw new BadRequestException('Пользователь не может скрыть свой gig');
+    }
+
+    console.log(gig);
+
+    await this.prisma.hiddenGig.create({
+      data: { userId, gigId },
+    });
+
+    return true;
+  }
+
+  async findHiddenGigs(userId: string) {
+    const hiddenGigIds = await this.prisma.hiddenGig
+      .findMany({
+        where: { userId },
+      })
+      .then((list) => list.map((hiddenGig) => hiddenGig.gigId));
+
+    const gigs = await this.prisma.gig.findMany({
+      where: { id: { in: hiddenGigIds } },
+    });
+
+    if (!gigs) throw new NotFoundException('Gigs не найдены');
+
+    return gigs;
+  }
 }

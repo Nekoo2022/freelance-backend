@@ -4,7 +4,9 @@ import { GigService } from './gig.service.js';
 import { CreateGigInput } from './inputs/create-gig.input.js';
 import { GigModel } from './model/gig.model.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
+import { OptionalCurrentUser } from '../auth/decorators/optional-current-user.decorator.js';
 import { UserModel } from '../user/model/user.model.js';
 import { UpdateGigInput } from './inputs/update-gig.input.js';
 
@@ -22,8 +24,9 @@ export class GigResolver {
   }
 
   @Query(() => [GigModel], { name: 'FindAllGigs' })
-  async findAllGigs() {
-    return this.gigService.findAllGigs();
+  @UseGuards(OptionalJwtAuthGuard)
+  async findAllGigs(@OptionalCurrentUser() user?: UserModel) {
+    return this.gigService.findAllGigs(user?.id);
   }
 
   @Query(() => [GigModel], { name: 'FindMyGig' })
@@ -71,5 +74,44 @@ export class GigResolver {
     @CurrentUser() user: UserModel,
   ) {
     return this.gigService.archiveGig(gigId, user.id);
+  }
+
+  @Mutation(() => Boolean, { name: 'AddToFavorites' })
+  @UseGuards(JwtAuthGuard)
+  async addToFavorites(
+    @Args('gigId', { type: () => String }) gigId: string,
+    @CurrentUser() user: UserModel,
+  ) {
+    return this.gigService.addToFavorites(gigId, user.id);
+  }
+
+  @Mutation(() => Boolean, { name: 'RemoveFromFavorites' })
+  @UseGuards(JwtAuthGuard)
+  async removeFromFavorites(
+    @Args('gigId', { type: () => String }) gigId: string,
+    @CurrentUser() user: UserModel,
+  ) {
+    return this.gigService.removeFromFavorites(gigId, user.id);
+  }
+
+  @Mutation(() => Boolean, { name: 'HideGig' })
+  @UseGuards(JwtAuthGuard)
+  async hideGig(
+    @Args('gigId', { type: () => String }) gigId: string,
+    @CurrentUser() user: UserModel,
+  ) {
+    return this.gigService.hideGig(gigId, user.id);
+  }
+
+  @Query(() => [GigModel], { name: 'FindFavoriteGigs' })
+  @UseGuards(JwtAuthGuard)
+  async findFavoriteGigs(@CurrentUser() user: UserModel) {
+    return this.gigService.findFavoriteGigs(user.id);
+  }
+
+  @Query(() => [GigModel], { name: 'FindHiddenGigs' })
+  @UseGuards(JwtAuthGuard)
+  async findHiddenGigs(@CurrentUser() user: UserModel) {
+    return this.gigService.findHiddenGigs(user.id);
   }
 }

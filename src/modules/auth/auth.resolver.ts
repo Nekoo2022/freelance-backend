@@ -12,26 +12,26 @@ import { UserModel } from '../user/model/user.model.js';
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation(() => AuthResponse)
+  @Mutation(() => AuthResponse, { name: 'Login' })
   async login(@Args('data', { type: () => LoginInput }) input: LoginInput) {
     return this.authService.login(input);
   }
 
-  @Mutation(() => AuthResponse)
+  @Mutation(() => AuthResponse, { name: 'Register' })
   async register(
     @Args('data', { type: () => CreateUserInput }) input: CreateUserInput,
   ) {
     return this.authService.register(input);
   }
 
-  @Mutation(() => AuthResponse)
+  @Mutation(() => AuthResponse, { name: 'RefreshToken' })
   async refreshToken(
     @Args('refreshToken', { type: () => String }) refreshToken: string,
   ) {
     return this.authService.refreshToken(refreshToken);
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => Boolean, { name: 'Logout' })
   @UseGuards(JwtAuthGuard)
   async logout(@CurrentUser() user: UserModel) {
     return this.authService.logout(user.id);

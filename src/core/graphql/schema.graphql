@@ -98,24 +98,30 @@ input LoginInput {
 }
 
 type Mutation {
+  AddToFavorites(gigId: String!): Boolean!
   ArchiveGig(gigId: String!): Boolean!
   CreateCategory(data: CreateCategoryInput!): Boolean!
   CreateCategoryChildren(data: CreateCategoryChildrenInput!): Boolean!
   CreateGig(data: CreateGigInput!): Boolean!
   CreateUser(data: CreateUserInput!): Boolean!
   DeleteGig(gigId: String!): Boolean!
+  HideGig(gigId: String!): Boolean!
+  Login(data: LoginInput!): AuthResponse!
+  Logout: Boolean!
   PublishGig(gigId: String!): Boolean!
+  RefreshToken(refreshToken: String!): AuthResponse!
+  Register(data: CreateUserInput!): AuthResponse!
+  RemoveFromFavorites(gigId: String!): Boolean!
   UpdateGig(data: UpdateGigInput!): Boolean!
-  login(data: LoginInput!): AuthResponse!
-  logout: Boolean!
-  refreshToken(refreshToken: String!): AuthResponse!
-  register(data: CreateUserInput!): AuthResponse!
 }
 
 type Query {
   FindAllGigs: [GigModel!]!
+  FindFavoriteGigs: [GigModel!]!
   FindGigById(gigId: String!): GigModel!
+  FindHiddenGigs: [GigModel!]!
   FindMyGig: [GigModel!]!
+  FindMyProfile: UserModel!
   GetUsers: [UserModel!]!
 }
 

@@ -32,6 +32,14 @@ export class UserService {
     }
   }
 
+  async findMyProfile(userId: string) {
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
+
+    return user;
+  }
+
   //   const user = await this.prisma.user.findUniqueOrThrow({
   //     where: { id: userId },
   //   });
