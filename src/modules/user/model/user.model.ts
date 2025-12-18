@@ -2,6 +2,7 @@ import { Field, GraphQLISODateTime, ObjectType } from '@nestjs/graphql';
 import { registerEnumType } from '@nestjs/graphql';
 import { UserRole, UserStatus } from '../../../../generated/prisma/client.js';
 import { GigModel } from '../../../modules/gig/model/gig.model.js';
+import { FavoriteGigModel } from '../../gig/model/favorite-gig.model.js';
 
 registerEnumType(UserRole, { name: 'UserRole' });
 registerEnumType(UserStatus, { name: 'UserStatus' });
@@ -44,8 +45,11 @@ export class UserModel {
   @Field(() => [GigModel])
   gigs: GigModel[];
 
-  @Field(() => [GigModel], { nullable: 'itemsAndList' })
-  hiddenGigs?: GigModel[];
+  @Field(() => [GigModel])
+  hiddenGigs: GigModel[];
+
+  @Field(() => [FavoriteGigModel])
+  favoriteGigs: FavoriteGigModel[];
 
   @Field(() => GraphQLISODateTime, { nullable: true })
   lockUntil?: Date;

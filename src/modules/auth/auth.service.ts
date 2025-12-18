@@ -12,6 +12,7 @@ import { CreateUserInput } from '../user/inputs/create-user.input.js';
 import { AuthResponse } from './model/auth-response.model.js';
 import { UserModel } from '../user/model/user.model.js';
 import { User } from '../../../generated/prisma/client.js';
+import { RegisterInput } from './inputs/register.input.js';
 
 @Injectable()
 export class AuthService {
@@ -74,7 +75,7 @@ export class AuthService {
     };
   }
 
-  async register(input: CreateUserInput): Promise<AuthResponse> {
+  async register(input: RegisterInput): Promise<AuthResponse> {
     const { email, username, password, name } = input;
 
     // Check if user already exists
@@ -240,6 +241,7 @@ export class AuthService {
       failedLoginAttempts: user.failedLoginAttempts,
       gigs: [],
       hiddenGigs: [],
+      favoriteGigs: [],
       lockUntil: user.lockUntil || undefined,
       role: user.role,
       status: user.status,

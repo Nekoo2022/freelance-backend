@@ -41,7 +41,10 @@ input CreateGigInput {
   imageUrl: String
 
   """Gig price"""
-  price: Float!
+  price: String!
+
+  """Gig requirements"""
+  requirements: String!
 
   """Gig title"""
   title: String!
@@ -66,6 +69,15 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type FavoriteGigModel {
+  createdAt: DateTime!
+  gig: GigModel!
+  gigId: String!
+  id: String!
+  user: UserModel!
+  userId: String!
+}
+
 type GigModel {
   authorId: String!
   categoryId: String!
@@ -79,6 +91,7 @@ type GigModel {
   isFeatured: Boolean!
   price: Float!
   rating: Float!
+  requirements: String!
   status: GigStatus!
   title: String!
   updatedAt: DateTime!
@@ -122,6 +135,7 @@ type Query {
   FindHiddenGigs: [GigModel!]!
   FindMyGig: [GigModel!]!
   FindMyProfile: UserModel!
+  FindUserByGigId(gigId: String!): UserModel!
   GetUsers: [UserModel!]!
 }
 
@@ -139,7 +153,10 @@ input UpdateGigInput {
   imageUrl: String
 
   """Gig price"""
-  price: Float
+  price: String
+
+  """Gig description"""
+  requirements: String
 
   """Gig title"""
   title: String
@@ -156,8 +173,9 @@ type UserModel {
   email: String!
   emailVerified: Boolean!
   failedLoginAttempts: Float!
+  favoriteGigs: [FavoriteGigModel!]!
   gigs: [GigModel!]!
-  hiddenGigs: [GigModel]
+  hiddenGigs: [GigModel!]!
   id: String!
   lastSeenAt: DateTime
   locale: String

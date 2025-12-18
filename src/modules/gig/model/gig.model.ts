@@ -19,6 +19,9 @@ export class GigModel {
   @Field(() => String)
   description: string;
 
+  @Field(() => String)
+  requirements: string;
+
   @Field(() => Number)
   price: number;
 

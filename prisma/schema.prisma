@@ -63,6 +63,7 @@ model Gig {
   description String
   price       Float
   deliveryTime Int // время выполнения в днях
+  requirements String // что нужно от покупателя
 
   imageUrl String?
 
@@ -96,10 +97,10 @@ model Gig {
 model HiddenGig {
   id String @id @default(cuid())
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
-  gig Gig @relation(fields: [gigId], references: [id])
+  gig Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
   gigId String
 
   createdAt DateTime @default(now())
@@ -112,10 +113,10 @@ model HiddenGig {
 model FavoriteGig{
   id String @id @default(cuid())
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
-  gig Gig @relation(fields: [gigId], references: [id])
+  gig Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
   gigId String
 
   createdAt DateTime @default(now())

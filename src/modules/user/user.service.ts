@@ -35,17 +35,23 @@ export class UserService {
   async findMyProfile(userId: string) {
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { id: userId },
+      include: { favoriteGigs: true },
     });
+
+    console.log(user);
 
     return user;
   }
 
-  //   const user = await this.prisma.user.findUniqueOrThrow({
-  //     where: { id: userId },
-  //   });
+  async findUserByGigId(gigId: string) {
+    const gig = await this.prisma.gig.findUniqueOrThrow({
+      where: { id: gigId },
+    });
 
-  //   await this.prisma.user.update({
-  //     where: { id: userId },
-  //     data: { locale, description, name },
-  //   });
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: gig.authorId },
+    });
+
+    return user;
+  }
 }

@@ -14,8 +14,15 @@ export class GigService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createGig(input: CreateGigInput, authorId: string): Promise<Boolean> {
-    const { deliveryTime, description, title, categoryId, imageUrl, price } =
-      input;
+    const {
+      deliveryTime,
+      description,
+      title,
+      categoryId,
+      imageUrl,
+      price,
+      requirements,
+    } = input;
 
     await this.prisma.gig.create({
       data: {
@@ -24,8 +31,9 @@ export class GigService {
         description,
         title,
         imageUrl,
-        price,
+        price: +price,
         authorId,
+        requirements,
       },
     });
 
@@ -79,7 +87,7 @@ export class GigService {
 
     await this.prisma.gig.update({
       where: { id: gigId, authorId },
-      data: { ...data },
+      data: { ...data, price: +data.price },
     });
 
     return true;
@@ -136,6 +144,11 @@ export class GigService {
       data: { gigId, userId },
     });
 
+    await this.prisma.gig.update({
+      where: { id: gigId },
+      data: { favoritesCount: { increment: 1 } },
+    });
+
     return true;
   }
 
@@ -147,6 +160,11 @@ export class GigService {
           gigId,
         },
       },
+    });
+
+    await this.prisma.gig.update({
+      where: { id: gigId },
+      data: { favoritesCount: { decrement: 1 } },
     });
 
     return true;

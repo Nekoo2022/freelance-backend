@@ -6,6 +6,7 @@ import {
   IsOptional,
   Min,
   MaxLength,
+  MinLength,
 } from 'class-validator';
 
 @InputType()
@@ -13,22 +14,32 @@ export class UpdateGigInput {
   @Field(() => String, { description: 'Gig title', nullable: true })
   @IsString()
   @IsNotEmpty()
-  @MaxLength(200)
+  @MinLength(5)
+  @MaxLength(50)
   @IsOptional()
   title?: string;
 
   @Field(() => String, { description: 'Gig description', nullable: true })
   @IsString()
   @IsNotEmpty()
-  @MaxLength(5000)
+  @MinLength(100)
+  @MaxLength(1000)
   @IsOptional()
   description?: string;
 
-  @Field(() => Float, { description: 'Gig price', nullable: true })
+  @Field(() => String, { description: 'Gig description', nullable: true })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(100)
+  @MaxLength(1000)
+  @IsOptional()
+  requirements?: string;
+
+  @Field(() => String, { description: 'Gig price', nullable: true })
   @IsNumber()
   @Min(0)
   @IsOptional()
-  price?: number;
+  price?: string;
 
   @Field(() => Int, { description: 'Delivery time in days', nullable: true })
   @IsNumber()
